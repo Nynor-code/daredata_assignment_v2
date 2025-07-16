@@ -1,0 +1,7 @@
+
+[dev]
+pytest
+pylint
+pytest-cov
+toml
+pandas
