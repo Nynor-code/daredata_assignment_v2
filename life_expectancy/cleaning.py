@@ -49,6 +49,7 @@ def clean_data(df, country_code='PT') -> pd.DataFrame:
     df_clean['value'] = df_clean['value'].astype(float)
 
     # Step 6: Filter for selected country only
+    # country_code is a Region enum, so we use its value
     df_country = df_clean[df_clean['region'] == country_code.value]
 
     # Step 7: Ensure column order

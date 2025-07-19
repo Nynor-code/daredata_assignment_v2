@@ -9,4 +9,5 @@ life_expectancy/life_expectancy.egg-info/top_level.txt
 life_expectancy/tests/__init__.py
 life_expectancy/tests/conftest.py
 life_expectancy/tests/test_cleaning.py
+life_expectancy/tests/test_enums.py
 life_expectancy/tests/test_pyproject.py
