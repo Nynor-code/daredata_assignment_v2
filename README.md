@@ -1,5 +1,7 @@
 # Foundations Learning Path Assignments
 
+[![Run Tests](https://github.com/Nynor-code/daredata_assignment_v2/actions/workflows/test.yml/badge.svg)](https://github.com/Nynor-code/daredata_assignment_v2/actions/workflows/test.yml)
+
 ## Introduction
 
 We are going to be using this project throughout the course.
