@@ -7,15 +7,22 @@ since we are learning, this is a special case.
 Once you have ensured that the package and its dependencies are installed,
 feel free to delete this file.
 """
-from pkg_resources import DistributionNotFound, get_distribution
-
+# standard library
+from unittest.mock import patch
+from pkg_resources import (
+    get_distribution,
+    DistributionNotFound
+    )
+# third-party
 import toml
 import pytest
 import pylint
 import pytest_cov
 import pandas as pd
-
+# local imports
 from . import PROJECT_DIR
+from tests import test_pyproject
+from life_expectancy.tests import test_pyproject
 
 
 def test_dependencies():
@@ -29,7 +36,8 @@ def test_dependencies():
     assert len(deps) == 4
 
 
-def test_pyproject():
+# renamed to avoid conflict with the test_pyproject module
+def test_pyproject_metadata():
     """Test that the pyproject.toml is correct."""
     pyproject = toml.load(PROJECT_DIR / "pyproject.toml")
 
@@ -62,3 +70,11 @@ def test_package():
         "that the version of the package in the pyproject.toml file "
         "is `0.1.0`."
     )
+
+
+# missing coverage for the except DistributionNotFound block
+def test_package_not_installed():
+    """Test behavior when package is not installed."""
+    with patch("life_expectancy.tests.test_pyproject.get_distribution", side_effect=DistributionNotFound):
+        with pytest.raises(AssertionError, match="life_expectancy package is not installed"):
+            test_pyproject.test_package()
