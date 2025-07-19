@@ -20,9 +20,8 @@ import pylint
 import pytest_cov
 import pandas as pd
 # local imports
+# from life_expectancy.tests import test_pyproject
 from . import PROJECT_DIR
-from tests import test_pyproject
-from life_expectancy.tests import test_pyproject
 
 
 def test_dependencies():
@@ -75,6 +74,7 @@ def test_package():
 # missing coverage for the except DistributionNotFound block
 def test_package_not_installed():
     """Test behavior when package is not installed."""
-    with patch("life_expectancy.tests.test_pyproject.get_distribution", side_effect=DistributionNotFound):
+    with patch("life_expectancy.tests.test_pyproject.get_distribution",
+               side_effect=DistributionNotFound):
         with pytest.raises(AssertionError, match="life_expectancy package is not installed"):
-            test_pyproject.test_package()
+            test_package()
