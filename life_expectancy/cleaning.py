@@ -12,12 +12,12 @@ from .enums import Region
 
 DATA_DIR = Path(__file__).resolve().parent / "data"
 
+
 def load_data() -> pd.DataFrame:
     """
     Loads the raw life expectancy data.
     returns a DataFrame with the loaded raw data.
     """
-
     file_path = DATA_DIR / "eu_life_expectancy_raw.tsv"
     return pd.read_csv(file_path, sep='\t', encoding="utf-8")
 
@@ -27,7 +27,6 @@ def clean_data(df, country_code='PT') -> pd.DataFrame:
     Cleans the life expectancy dataset for a specific country.
     returns a DataFrame with the cleaned data on the specific country.
     """
-
     # Step 1: Strip column names to remove trailing spaces
     df.columns = df.columns.str.strip()
 
@@ -63,7 +62,6 @@ def save_data(df_country, country_code: Region = Region.PT) -> None:
     Saves the cleaned dataset to a CSV file.
     The filename is based on the country code.
     """
-
     output_filename = f'{country_code.lower()}_life_expectancy.csv'
     output_path = DATA_DIR / output_filename
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -73,7 +71,6 @@ def main() -> pd.DataFrame:
     """
     Main function to orchestrate the data loading, cleaning, and saving.
     """
-
     parser = argparse.ArgumentParser(
         description="Clean life expectancy dataset for a given country."
         )
