@@ -172,7 +172,7 @@ cython_debug/
 # VS Code stuff
 .vscode/
 
-.DS_Store
+.DS_Store/
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

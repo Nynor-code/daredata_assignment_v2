@@ -22,10 +22,10 @@ dev = [
     "pandas"
     ]
 
-[tool.coverage.run]
-omit = [
-    "*/conftest.py", "*/test*", # omit test files
-]
+# [tool.coverage.run]
+# omit = [
+#     "*/conftest.py", "*/test*", # omit test files
+# ]
 
 [tool.setuptools.packages.find]
 where           = ["life_expectancy"]
