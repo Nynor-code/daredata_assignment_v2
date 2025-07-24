@@ -22,10 +22,11 @@ def load_data() -> pd.DataFrame:
     return pd.read_csv(file_path, sep='\t', encoding="utf-8")
 
 
-def clean_data(df, country_code='PT') -> pd.DataFrame:
+def clean_data(df, country_code={'PT'}) -> pd.DataFrame:
     """
     Cleans the life expectancy dataset for a specific country.
     returns a DataFrame with the cleaned data on the specific country.
+    NOTE: age 'Y_GE85' and 'Y_LT1' were kept as they are valid age groups
     """
     # Step 1: Strip column names to remove trailing spaces
     df.columns = df.columns.str.strip()
