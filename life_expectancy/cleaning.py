@@ -22,7 +22,7 @@ def load_data() -> pd.DataFrame:
     return pd.read_csv(file_path, sep='\t', encoding="utf-8")
 
 
-def clean_data(df, export_country_code={'PT'}) -> pd.DataFrame:
+def clean_data(df, export_country_code='PT') -> pd.DataFrame:
     """
     Cleans the life expectancy dataset for a specific country.
     returns a DataFrame with the cleaned data on the specific country.
@@ -59,12 +59,12 @@ def clean_data(df, export_country_code={'PT'}) -> pd.DataFrame:
     return df_country
 
 
-def save_data(df_country, country_code: Region = Region.PT) -> None:
+def save_data(df_country, export_country_code: Region = Region.PT) -> None:
     """
     Saves the cleaned dataset to a CSV file.
     The filename is based on the country code.
     """
-    output_filename = f'{country_code.lower()}_life_expectancy.csv'
+    output_filename = f'{export_country_code.lower()}_life_expectancy.csv'
     output_path = DATA_DIR / output_filename
     output_path.parent.mkdir(parents=True, exist_ok=True)
     df_country.to_csv(output_path, index=False)
@@ -93,8 +93,8 @@ def main() -> pd.DataFrame:
         ) from exc
 
     df_raw = load_data()
-    df_cleaned = clean_data(df_raw, country_code=country_enum)
-    save_data(df_cleaned, country_code=country_enum)
+    df_cleaned = clean_data(df_raw, export_country_code=country_enum)
+    save_data(df_cleaned, export_country_code=country_enum)
 
     return df_cleaned
 
