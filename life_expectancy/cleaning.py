@@ -22,7 +22,7 @@ def load_data() -> pd.DataFrame:
     return pd.read_csv(file_path, sep='\t', encoding="utf-8")
 
 
-def clean_data(df, country_code={'PT'}) -> pd.DataFrame:
+def clean_data(df, export_country_code={'PT'}) -> pd.DataFrame:
     """
     Cleans the life expectancy dataset for a specific country.
     returns a DataFrame with the cleaned data on the specific country.
@@ -51,7 +51,7 @@ def clean_data(df, country_code={'PT'}) -> pd.DataFrame:
 
     # Step 6: Filter for selected country only
     # country_code is a Region enum, so we use its value
-    df_country = df_clean[df_clean['region'] == country_code.value]
+    df_country = df_clean[df_clean['region'] == export_country_code.value]
 
     # Step 7: Ensure column order
     df_country = df_country[['unit', 'sex', 'age', 'region', 'year', 'value']]
