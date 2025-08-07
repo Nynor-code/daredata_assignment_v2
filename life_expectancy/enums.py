@@ -1,5 +1,6 @@
 """
 File: life_expectancy/enums.py
+
 Defines the Region enum for European countries and aggregates.
 Provides a method to retrieve actual countries, excluding aggregates.
 """
