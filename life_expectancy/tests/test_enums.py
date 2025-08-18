@@ -1,6 +1,7 @@
 """
 Tests for the Region enum in the life_expectancy package.
-Specifically, it checks that the actual_countries method excludes aggregate regions.
+Specifically, it checks that the actual_countries method excludes 
+aggregate regions.
 """
 # Local imports
 from life_expectancy.enums import Region
