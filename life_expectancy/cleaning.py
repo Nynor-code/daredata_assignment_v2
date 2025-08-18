@@ -26,6 +26,7 @@ def clean_data(df, export_country_code: Region = Region.PT) -> pd.DataFrame:
     """
     Cleans the life expectancy dataset for a specific country.
     returns a DataFrame with the cleaned data on the specific country.
+    
     NOTE: age 'Y_GE85' and 'Y_LT1' were kept as they are valid age groups
     """
     # Step 1: Strip column names to remove trailing spaces
