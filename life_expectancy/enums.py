@@ -10,7 +10,7 @@ from typing import List
 
 class Region(str, Enum):
     """
-    Enum representing European countries and aggregates.
+    Enum representing countries and aggregates.
     List collected for existant raw data in the life expectancy dataset.
     """
     AL = "AL"
@@ -24,10 +24,19 @@ class Region(str, Enum):
     CY = "CY"
     CZ = "CZ"
     DE = "DE"
+    DE_TOT = "DE_TOT"
     DK = "DK"
+    EA18 = "EA18"
+    EA19 = "EA19"
     EE = "EE"
+    EEA30_2007 = "EEA30_2007"
+    EEA31 = "EEA31"
+    EFTA = "EFTA"
     EL = "EL"
     ES = "ES"
+    EU27_2007 = "EU27_2007"
+    EU27_2020 = "EU27_2020"
+    EU28 = "EU28"
     FI = "FI"
     FR = "FR"
     FX = "FX"
@@ -60,15 +69,6 @@ class Region(str, Enum):
     UA = "UA"
     UK = "UK"
     XK = "XK"
-    EEA30_2007 = "EEA30_2007"
-    DE_TOT = "DE_TOT"
-    EU27_2007 = "EU27_2007"
-    EU27_2020 = "EU27_2020"
-    EU28 = "EU28"
-    EEA31 = "EEA31"
-    EFTA = "EFTA"
-    EA18 = "EA18"
-    EA19 = "EA19"
     
     @classmethod
     def actual_countries(cls) -> List["Region"]:
@@ -76,7 +76,14 @@ class Region(str, Enum):
         Returns a list of actual countries, excluding aggregates like EU27, EFTA, etc.
         """
         excluded = {
-            cls.DE_TOT, cls.EA18, cls.EA19, cls.EEA30_2007, cls.EEA31,
-            cls.EFTA, cls.EU27_2007, cls.EU27_2020, cls.EU28
+            cls.DE_TOT,
+            cls.EA18,
+            cls.EA19,
+            cls.EEA30_2007,
+            cls.EEA31,
+            cls.EFTA,
+            cls.EU27_2007,
+            cls.EU27_2020,
+            cls.EU28
         }
         return [r for r in cls if r not in excluded]
