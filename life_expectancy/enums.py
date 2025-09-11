@@ -8,7 +8,6 @@ Provides a method to retrieve actual countries, excluding aggregates.
 from enum import Enum
 from typing import List
 
-
 class Region(str, Enum):
     """
     Enum representing European countries and aggregates.
@@ -25,19 +24,10 @@ class Region(str, Enum):
     CY = "CY"
     CZ = "CZ"
     DE = "DE"
-    DE_TOT = "DE_TOT"
     DK = "DK"
-    EA18 = "EA18"
-    EA19 = "EA19"
     EE = "EE"
-    EEA30_2007 = "EEA30_2007"
-    EEA31 = "EEA31"
-    EFTA = "EFTA"
     EL = "EL"
     ES = "ES"
-    EU27_2007 = "EU27_2007"
-    EU27_2020 = "EU27_2020"
-    EU28 = "EU28"
     FI = "FI"
     FR = "FR"
     FX = "FX"
@@ -70,7 +60,16 @@ class Region(str, Enum):
     UA = "UA"
     UK = "UK"
     XK = "XK"
-
+    EEA30_2007 = "EEA30_2007"
+    DE_TOT = "DE_TOT"
+    EU27_2007 = "EU27_2007"
+    EU27_2020 = "EU27_2020"
+    EU28 = "EU28"
+    EEA31 = "EEA31"
+    EFTA = "EFTA"
+    EA18 = "EA18"
+    EA19 = "EA19"
+    
     @classmethod
     def actual_countries(cls) -> List["Region"]:
         """
