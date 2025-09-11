@@ -22,7 +22,7 @@ def test_actual_countries_excludes_aggregates():
         "EU27_2020",
         "EU28"
     }
-    
+
     actual_regions = Region.actual_countries()
     actual_codes = {r.value for r in actual_regions}
 

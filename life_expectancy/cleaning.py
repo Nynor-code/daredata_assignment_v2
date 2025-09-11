@@ -83,7 +83,7 @@ def main() -> pd.DataFrame:
 
     try:
         country_enum = Region[args.country]
-        
+
     except KeyError as exc:
         # user friendly list presentation of valid country codes
         valid_values = [r.value for r in Region.actual_countries()]

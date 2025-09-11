@@ -69,7 +69,7 @@ class Region(str, Enum):
     UA = "UA"
     UK = "UK"
     XK = "XK"
-    
+
     @classmethod
     def actual_countries(cls) -> List["Region"]:
         """
