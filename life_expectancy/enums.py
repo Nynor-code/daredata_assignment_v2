@@ -69,7 +69,7 @@ class Region(str, Enum):
     EFTA = "EFTA"
     EA18 = "EA18"
     EA19 = "EA19"
-    
+
     @classmethod
     def actual_countries(cls) -> List["Region"]:
         """

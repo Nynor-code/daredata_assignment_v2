@@ -1,5 +1,4 @@
-# from .cleaning import load_data, clean_data
-# __all__ = ["load_data", "clean_data"]
-
-# remove program warning
+"""
+Life Expectancy Data Processing Package
+"""
 __all__ = []
