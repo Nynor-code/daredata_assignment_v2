@@ -8,9 +8,7 @@ from life_expectancy.enums import Region
 
 
 def test_actual_countries_excludes_aggregates():
-    """
-    Test that the actual_countries method excludes aggregate regions.
-    """
+    """Test that the actual_countries method excludes aggregate regions."""
     aggregate_codes = {"DE_TOT",
                        "EA18",
                        "EA19",

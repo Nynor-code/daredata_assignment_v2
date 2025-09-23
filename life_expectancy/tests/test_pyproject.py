@@ -25,9 +25,7 @@ from . import PROJECT_DIR
 
 
 def test_dependencies():
-    """
-    Test that the get_versions function return 4 values.
-    """
+    """Test that the get_versions function return 4 values."""
     deps = (
         pd.__version__,
         pytest.__version__,
@@ -39,9 +37,7 @@ def test_dependencies():
 
 # renamed to avoid conflict with the test_pyproject module
 def test_pyproject_metadata():
-    """
-    Test that the pyproject.toml is correct.
-    """
+    """Test that the pyproject.toml is correct."""
     pyproject = toml.load(PROJECT_DIR / "pyproject.toml")
 
     authors = pyproject["project"]["authors"]
@@ -58,9 +54,7 @@ def test_pyproject_metadata():
 
 
 def test_package():
-    """
-    Test that the life_expectancy package is installed.
-    """
+    """Test that the life_expectancy package is installed."""
     try:
         installed_package = get_distribution("life_expectancy")
     except DistributionNotFound:
@@ -79,9 +73,7 @@ def test_package():
 
 # missing coverage for the except DistributionNotFound block
 def test_package_not_installed():
-    """
-    Test behavior when package is not installed.
-    """
+    """Test behavior when package is not installed."""
     with patch("life_expectancy.tests.test_pyproject.get_distribution",
                side_effect=DistributionNotFound):
         with pytest.raises(AssertionError, match="life_expectancy package is not installed"):
