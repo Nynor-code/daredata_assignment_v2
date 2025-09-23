@@ -29,12 +29,12 @@ runPT:
 	@echo "----------------------------------------"
 	$(PYTHON) -m $(PKG).cleaning --country PT
 
-runDE:
+run-de:
 	@echo "Running life expectancy for DE"
 	@echo "----------------------------------------"
 	$(PYTHON) -m $(PKG).cleaning --country DE
 
-runERROR:
+run-error:
 	@echo "Running life expectancy for invalid country XX"
 	@echo "----------------------------------------"
 	$(PYTHON) -m $(PKG).cleaning --country XX

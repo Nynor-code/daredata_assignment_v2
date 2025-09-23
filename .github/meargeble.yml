@@ -1,0 +1,45 @@
+# .github/mergeable.yml
+version: 2
+mergeable:
+  # ---------- Pull Request Rules ----------
+  - when: pull_request.opened
+    validate:
+      - do: title
+        must_include:
+          regex: '^(feat|fix|docs|chore|refactor|test|ci): .+'
+        message: "PR title must follow Conventional Commits (e.g., 'feat: add cleaning script')"
+
+      - do: description
+        must_include:
+          regex: '.{20,}'
+        message: "PR description must be at least 20 characters long."
+
+      - do: approvals
+        min:
+          count: 1
+        message: "At least one reviewer approval is required."
+
+      - do: label
+        must_include:
+          regex: '^(bug|enhancement|documentation|refactor)$'
+        message: "PR must include a valid label: bug | enhancement | documentation | refactor"
+
+  # ---------- Commit Message Rules ----------
+  - when: pull_request.synchronize
+    validate:
+      - do: commits
+        message:
+          regex: '^(feat|fix|docs|chore|refactor|test|ci): .+'
+        message: "Commit messages must follow Conventional Commits format."
+
+  # ---------- Issue Rules ----------
+  - when: issues.opened
+    validate:
+      - do: title
+        must_exclude:
+          regex: '^(fix|feat):'
+        message: "Issue titles should not start with commit prefixes."
+      - do: description
+        must_include:
+          regex: '.{15,}'
+        message: "Issue description must be at least 15 characters long."

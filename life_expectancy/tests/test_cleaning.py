@@ -30,7 +30,6 @@ DATA_DIR = (
     / "fixtures"
 )
 
-
 # =============================================================================
 # Core cleaning behavior
 # =============================================================================
@@ -228,6 +227,7 @@ def test_main_with_other_country(
 
 def test_main_invalid_country(monkeypatch: pytest.MonkeyPatch) -> None:
     """Invalid country code should raise a user-friendly ValueError."""
+
     monkeypatch.setattr(
         "argparse.ArgumentParser.parse_args",
         lambda self: argparse.Namespace(country="XX"),

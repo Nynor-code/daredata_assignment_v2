@@ -226,6 +226,7 @@ def main() -> pd.DataFrame:
     # Validate / map country to Region enum
     try:
         country_enum = Region[args.country]
+
     except KeyError as exc:
         valid_values = [r.value for r in Region.actual_countries()]
         chunks = [
