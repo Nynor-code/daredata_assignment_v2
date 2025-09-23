@@ -1,15 +1,15 @@
 # run life expectancy
-runPT:
+run-pt:
 	@echo "Running life expectancy"
 	@echo "----------------------------------------"
 	python -m life_expectancy.cleaning --country PT
 
-runDE:
+run-de:
 	@echo "Running life expectancy"
 	@echo "----------------------------------------"
 	python -m life_expectancy.cleaning --country DE
 
-runERROR:
+run-error:
 	@echo "Running life expectancy"
 	@echo "----------------------------------------"
 	python -m life_expectancy.cleaning --country XX
