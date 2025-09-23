@@ -5,8 +5,10 @@ Cleans the life expectancy dataset for a specific country (default: Portugal).
 # standard imports
 import argparse
 from pathlib import Path
+
 # third party imports
 import pandas as pd
+
 # local imports
 from .enums import Region
 
@@ -82,6 +84,7 @@ def main() -> pd.DataFrame:
 
     try:
         country_enum = Region[args.country]
+
     except KeyError as exc:
         # user friendly list presentation of valid country codes
         valid_values = [r.value for r in Region.actual_countries()]
