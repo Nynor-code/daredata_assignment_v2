@@ -69,7 +69,6 @@ class Region(str, Enum):
     UA = "UA"
     UK = "UK"
     XK = "XK"
-    
 
 
     @classmethod
