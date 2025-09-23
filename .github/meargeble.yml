@@ -32,15 +32,6 @@ mergeable:
           regex: '^(feat|fix|docs|chore|refactor|test|ci): .+'
         message: "Commit messages must follow Conventional Commits format."
 
-  # ---------- Branch Rules ----------
-  # this rule is nice but was commented because this project had followed other branch naming conventions in the past
-  # - when: pull_request.opened
-  #  validate:
-  #    - do: headRef
-  #      must_include:
-  #        regex: '^(feature|bugfix|hotfix|refactor)/.+'
-  #      message: "Branch names must start with feature/, bugfix/, hotfix/, or refactor/"
-
   # ---------- Issue Rules ----------
   - when: issues.opened
     validate:
