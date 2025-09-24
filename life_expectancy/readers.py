@@ -6,7 +6,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import json
-from typing import Dict, Iterable, List
+from typing import Any, Dict, Iterable, List
 
 # third party imports
 import pandas as pd
@@ -64,12 +64,28 @@ class CSVReader:
 
 @dataclass
 class EurostatJSONAdapter:
-    """Adapter for Eurostat-like JSON files (records-list or compact SDMX-like)."""
+    """
+    Adapter for Eurostat-like JSON files.
+
+    Supports two shapes:
+      1) Records-list: list[dict] with keys similar to
+         unit/sex/age/geo/(time|year|date)/value
+         - Accepts common aliases (e.g., 'country' for geo, 'obs_value' for value).
+      2) Compact object:
+         {
+           "dimension": { <per-dimension metadata> },
+           "value": { "<linear_index>": <numeric> }
+         }
+
+    Returns a normalized long DataFrame with columns:
+      ['unit', 'sex', 'age', 'geo', 'time', 'value'],
+    where 'time' is a string (e.g. "2019") and 'value' is numeric.
+    """
 
     path: Path
-    
-    
+
     def read(self) -> pd.DataFrame:
+        """Route to the appropriate parser based on JSON shape."""
         with open(self.path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
@@ -77,20 +93,23 @@ class EurostatJSONAdapter:
             return self._read_records_list(data)
 
         if isinstance(data, dict) and "dimension" in data and "value" in data:
-            return self._read_compact_dict(data)
+            # Call staticmethod via class to avoid pylint no-member on instance.
+            return EurostatJSONAdapter._read_compact_dict(data)
 
         raise ValueError("Unsupported JSON shape.")
 
+    # ---------------------------------------------------------------------
+    # Records-list shape
+    # ---------------------------------------------------------------------
 
     @staticmethod
     def _read_records_list(records: Iterable[dict]) -> pd.DataFrame:
+        """Read a list of record dicts and normalize columns."""
         df = pd.DataFrame(records)
-        # lower all columns for robust matching
         df.columns = [c.lower() for c in df.columns]
 
-
-        # -------- alias resolution (geo/value/time) ----------
-        def pick(cols, *candidates):
+        def pick(cols: set[str], *candidates: str) -> str | None:
+            """Return the first candidate present in `cols`, else None."""
             for c in candidates:
                 if c in cols:
                     return c
@@ -98,58 +117,162 @@ class EurostatJSONAdapter:
 
         cols = set(df.columns)
 
-        # time can be: time | year | date
+        # Find time-like column
         time_col = pick(cols, "time", "year", "date")
         if time_col is None:
-            # keep the original error behavior, but clearer
-            raise ValueError("JSON missing a time-like key among: ['time','year','date']")
+            raise ValueError(
+                "JSON missing a time-like key among: ['time', 'year', 'date']"
+            )
 
-        # geo can be: geo | country | region | geo_code | geocode | nuts_code
-        geo_col = pick(cols, "geo", "country", "region", "geo_code", "geocode", "nuts_code")
-        # value can be: value | values | obs_value | obsvalue | life_expectancy | le | val
+        # Aliases for geo and value
+        geo_col = pick(
+            cols, "geo", "country", "region", "geo_code", "geocode", "nuts_code"
+        )
         value_col = pick(
-            cols, "value", "values", "obs_value", "obsvalue", "life_expectancy", "lifeexpectancy", "le", "val"
+            cols,
+            "value",
+            "values",
+            "obs_value",
+            "obsvalue",
+            "life_expectancy",
+            "lifeexpectancy",
+            "le",
+            "val",
         )
 
-        # Standardize column names where present
-        rename_map = {}
+        # Standardize present columns
+        rename_map: dict[str, str] = {}
         if time_col != "time":
             rename_map[time_col] = "time"
         if geo_col and geo_col != "geo":
             rename_map[geo_col] = "geo"
         if value_col and value_col != "value":
             rename_map[value_col] = "value"
-
         df = df.rename(columns=rename_map)
 
-        # If 'year' exists alongside 'time', fill NaNs in time from year (existing behavior)
+        # If both 'year' and 'time' exist, fill missing 'time' from 'year'
         if "year" in df.columns and "time" in df.columns:
             df["time"] = df["time"].where(df["time"].notna(), df["year"])
-            # Drop extra 'year' after merge
             df = df.drop(columns=["year"])
 
-        # ---- required keys check (after aliasing) ----
         needed = {"unit", "sex", "age", "geo", "time", "value"}
         missing = needed - set(df.columns)
         if missing:
-            # help the user by showing what IS present
             present = sorted(df.columns.tolist())
-            raise ValueError(f"JSON missing keys: {sorted(missing)}. Present keys: {present}")
+            raise ValueError(
+                "JSON missing keys: "
+                f"{sorted(missing)}. "
+                f"Present keys: {present}"
+            )
 
-
-        # Normalize: 'time' → "YYYY" string, 'value' → numeric
+        # Normalize: time -> "YYYY" (string), value -> numeric
         def _norm_time(x: object) -> str:
-            try:
-                v = float(x)
+            """Convert time-like value to string, e.g. 2019.0 -> '2019'."""
+            # Only attempt float conversion for common scalar types
+            if isinstance(x, (int, float, str)):
+                try:
+                    v = float(x)
+                except (TypeError, ValueError):
+                    return str(x)
                 if pd.notna(v):
                     return str(int(v))
-            except Exception:
-                pass
+                return ""
+            # Fallback for exotic types
             return str(x)
 
         df["time"] = df["time"].map(_norm_time)
         df["value"] = pd.to_numeric(df["value"], errors="coerce")
 
+        return df.dropna(subset=["value"]).reset_index(drop=True)
+
+    # ---------------------------------------------------------------------
+    # Compact SDMX-like shape (helpers to keep locals low)
+    # ---------------------------------------------------------------------
+
+    @staticmethod
+    def _labels_from_dimension(dim: dict, key: str) -> Dict[int, str]:
+        """Return index->label map for a given dimension key."""
+        block = dim.get(key) or dim.get(key.upper())
+        if not block:
+            return {}
+        cat = block.get("category", {})
+        lab = cat.get("label", {})
+        return {int(k): str(v) for k, v in lab.items()}
+
+    @staticmethod
+    def _dimension_order(dim: dict) -> List[str]:
+        """Use explicit order; else default canonical order."""
+        found = [k for k in ("unit", "sex", "age", "geo", "time") if k in dim]
+        return found or ["unit", "sex", "age", "geo", "time"]
+
+    @staticmethod
+    def _dimension_sizes(dim: dict, order: List[str], maps: Dict[str, Dict[int, str]]
+                         ) -> List[int]:
+        """Return the cardinality of each dimension in order."""
+        sizes: List[int] = []
+        for k in order:
+            block = dim.get(k) or dim.get(k.upper()) or {}
+            idx = (block.get("category") or {}).get("index")
+            sizes.append(len(idx) if idx else len(maps[k]))
+        return sizes
+
+    @staticmethod
+    def _unravel(index: int, bases: List[int]) -> List[int]:
+        """Convert linear index to multi-dimensional coordinates."""
+        coords: List[int] = []
+        for b in reversed(bases):
+            coords.append(index % b)
+            index //= b
+        return list(reversed(coords))
+
+    @staticmethod
+    def _build_maps_and_bases(dim: dict) -> tuple[List[str], Dict[str, Dict[int, str]],
+                                                  List[int]]:
+        """Build dimension order, label maps, and base sizes."""
+        order = EurostatJSONAdapter._dimension_order(dim)
+        maps = {k: EurostatJSONAdapter._labels_from_dimension(dim, k) or {0: ""} for k in order}
+        bases = EurostatJSONAdapter._dimension_sizes(dim, order, maps)
+        return order, maps, bases
+
+    @staticmethod
+    def _rows_from_values(
+        values: Dict[str, Any],
+        order: List[str],
+        maps: Dict[str, Dict[int, str]],
+        bases: List[int],
+    ) -> List[Dict[str, Any]]:
+        """Materialize rows from value dict using dimension maps."""
+        rows: List[Dict[str, Any]] = []
+        for k, v in values.items():
+            try:
+                lin = int(k)
+            except (TypeError, ValueError):
+                continue
+            coord = EurostatJSONAdapter._unravel(lin, bases)
+            rec: Dict[str, Any] = {name: maps[name].get(c, str(c)) for name, c in zip(order, coord)}
+            # value can be float/int/str; keep as-is, we'll coerce later with pd.to_numeric
+            rec["value"] = v
+            rows.append(rec)
+        return rows
+
+    @staticmethod
+    def _read_compact_dict(data: dict) -> pd.DataFrame:
+        """Read a compact Eurostat-like dict with 'dimension' and 'value'."""
+        dim: dict = data["dimension"]
+        values: Dict[str, float] = data["value"]
+
+        order, maps, bases = EurostatJSONAdapter._build_maps_and_bases(dim)
+        rows = EurostatJSONAdapter._rows_from_values(values, order, maps, bases)
+
+        df = pd.DataFrame(rows)
+
+        # Ensure all required columns exist
+        for col in ["unit", "sex", "age", "geo", "time"]:
+            if col not in df.columns:
+                df[col] = ""
+
+        df["time"] = df["time"].astype(str)
+        df["value"] = pd.to_numeric(df["value"], errors="coerce")
         return df.dropna(subset=["value"]).reset_index(drop=True)
 
 
