@@ -1,8 +1,9 @@
 # Config
-PYTHON   ?= python
-PKG      ?= life_expectancy
-INPUT    ?= eu_life_expectancy_raw.tsv   # filename inside $(PKG)/data/
-COUNTRY  ?= PT
+PYTHON   	?= python
+PKG      	?= life_expectancy
+INPUT    	?= eu_life_expectancy_raw.tsv   # filename inside $(PKG)/data/
+INPUT-JSON  ?= eurostat_life_expect.json
+COUNTRY  	?= PT
 
 # Phony
 .PHONY: help run runPT runDE runERROR test lint clean
@@ -38,6 +39,13 @@ run-error:
 	@echo "Running life expectancy for invalid country XX"
 	@echo "----------------------------------------"
 	$(PYTHON) -m $(PKG).cleaning --country XX
+
+# Generic run import Eurostat JSON (parametric)
+# use FR to ensure it's different from PT (default)
+run-json:
+	@echo "Running life expectancy"
+	@echo "----------------------------------------"
+	$(PYTHON) -m $(PKG).cleaning --country FR --input $(INPUT-JSON)
 
 # Tests & Lint
 test:
